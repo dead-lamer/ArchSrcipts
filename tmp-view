@@ -1,0 +1,10 @@
+#!/bin/bash
+
+TEMP_LIST="/var/lib/temp-packages.list"
+
+if [ -s "$TEMP_LIST" ]; then
+  echo "TMP_LIST:"
+  cat "$TEMP_LIST"
+else
+  echo "TMP_LIST is empty"
+fi

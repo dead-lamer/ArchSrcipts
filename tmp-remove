@@ -1,0 +1,28 @@
+#!/bin/bash
+
+TEMP_LIST="/var/lib/temp-packages.list"
+
+if [ ! -s "$TEMP_LIST" ]; then
+  echo "No tmp installed packages found"
+  exit 0
+fi
+
+if [ "$1" = "--all" ] || [ $# -eq 0 ]; then
+  echo "Removing all tmp packages..."
+  cat "$TEMP_LIST"
+  sudo pacman -Rns $(cat "$TEMP_LIST")
+  sudo truncate -s 0 "$TEMP_LIST"
+  echo "All tmp packages removed successfully"
+else
+  for pkg in "$@"; do
+    if grep -q "^pkg$" "$TEMP_LIST"; then
+      sudo pacman -Rns "$pkg"
+      sudo sed -i "/^$pkg/d"$TEMP_LIST""
+      echo "Removed package: $pkg"
+    else
+      echo "Package $pkg wasn't found"
+    fi
+  done
+fi
+
+sudo pacman -Qdtq | ifne sudo pacman -Rns -

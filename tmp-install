@@ -1,0 +1,22 @@
+#!/bin/bash
+
+TEMP_LIST="/var/lib/temp-packages.list"
+
+if [ $# -eq 0 ]; then
+  echo "Usage: tmp-install <package 1> <package 2> ..."
+  exit 1
+fi
+
+sudo pacman -S --needed "$@"
+
+
+for pkg in "$@"; do
+  pkg_name=$(pacman -Q "$pkg" 2> /dev/null | awk '{print $1}')
+
+  if [ -n "$pkg_name" ]; then
+    if ! grep -q "^$pkg_name" "$TEMP_LIST" 2>/dev/null; then
+      echo "$pkg_name" | sudo tee -a "$TEMP_LIST" > /dev/null
+      echo "Installed Temporary: $pkg_name"
+    fi
+  fi
+done
